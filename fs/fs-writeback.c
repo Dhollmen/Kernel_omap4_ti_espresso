@@ -103,12 +103,8 @@ static void bdi_wakeup_flusher(struct backing_dev_info *bdi)
 static void bdi_queue_work(struct backing_dev_info *bdi,
 			   struct wb_writeback_work *work)
 {
-	trace_writeback_queue(bdi, work);
-
 	spin_lock_bh(&bdi->wb_lock);
 	list_add_tail(&work->list, &bdi->work_list);
-	if (!bdi->wb.task)
-		trace_writeback_nothread(bdi, work);
 	bdi_wakeup_flusher(bdi);
 	spin_unlock_bh(&bdi->wb_lock);
 }
@@ -126,7 +122,6 @@ __bdi_start_writeback(struct backing_dev_info *bdi, long nr_pages,
 	work = kzalloc(sizeof(*work), GFP_ATOMIC);
 	if (!work) {
 		if (bdi->wb.task) {
-			trace_writeback_nowork(bdi);
 			wake_up_process(bdi->wb.task);
 		}
 		return;
@@ -171,7 +166,6 @@ void bdi_start_background_writeback(struct backing_dev_info *bdi)
 	 * We just wake up the flusher thread. It will perform background
 	 * writeback as soon as there is no other work to do.
 	 */
-	trace_writeback_wake_background(bdi);
 	spin_lock_bh(&bdi->wb_lock);
 	bdi_wakeup_flusher(bdi);
 	spin_unlock_bh(&bdi->wb_lock);
@@ -538,7 +532,7 @@ static int writeback_sb_inodes(struct super_block *sb, struct bdi_writeback *wb,
 		spin_lock(&inode->i_lock);
 		if (inode->i_state & (I_NEW | I_FREEING | I_WILL_FREE)) {
 			spin_unlock(&inode->i_lock);
-			requeue_io(inode);
+                        redirty_tail(inode);
 			continue;
 		}
 
@@ -586,7 +580,8 @@ void writeback_inodes_wb(struct bdi_writeback *wb,
 	if (!wbc->wb_start)
 		wbc->wb_start = jiffies; /* livelock avoidance */
 	spin_lock(&inode_wb_list_lock);
-	if (!wbc->for_kupdate || list_empty(&wb->b_io))
+
+	if (list_empty(&wb->b_io))
 		queue_io(wb, wbc->older_than_this);
 
 	while (!list_empty(&wb->b_io)) {
@@ -612,7 +607,7 @@ static void __writeback_inodes_sb(struct super_block *sb,
 {
 
 	spin_lock(&inode_wb_list_lock);
-	if (!wbc->for_kupdate || list_empty(&wb->b_io))
+	if (list_empty(&wb->b_io))
 		queue_io(wb, wbc->older_than_this);
 	writeback_sb_inodes(sb, wb, wbc, true);
 	spin_unlock(&inode_wb_list_lock);
@@ -669,11 +664,6 @@ static long wb_writeback(struct bdi_writeback *wb,
 	long write_chunk = MAX_WRITEBACK_PAGES;
 	struct inode *inode;
 
-	if (wbc.for_kupdate) {
-		wbc.older_than_this = &oldest_jif;
-		oldest_jif = jiffies -
-				msecs_to_jiffies(dirty_expire_interval * 10);
-	}
 	if (!wbc.range_cyclic) {
 		wbc.range_start = 0;
 		wbc.range_end = LLONG_MAX;
@@ -720,35 +710,39 @@ static long wb_writeback(struct bdi_writeback *wb,
 		if (work->for_background && !over_bground_thresh())
 			break;
 
+		if (work->for_kupdate) {
+			oldest_jif = jiffies -
+				msecs_to_jiffies(dirty_expire_interval * 10);
+			wbc.older_than_this = &oldest_jif;
+		}
+
 		wbc.more_io = 0;
 		wbc.nr_to_write = write_chunk;
 		wbc.pages_skipped = 0;
 
-		trace_wbc_writeback_start(&wbc, wb->bdi);
 		if (work->sb)
 			__writeback_inodes_sb(work->sb, wb, &wbc);
 		else
 			writeback_inodes_wb(wb, &wbc);
-		trace_wbc_writeback_written(&wbc, wb->bdi);
 
 		work->nr_pages -= write_chunk - wbc.nr_to_write;
 		wrote += write_chunk - wbc.nr_to_write;
 
 		/*
-		 * If we consumed everything, see if we have more
+		 * Did we write something? Try for more
+		 *
+		 * Dirty inodes are moved to b_io for writeback in batches.
+		 * The completion of the current batch does not necessarily
+		 * mean the overall work is done. So we keep looping as long
+		 * as made some progress on cleaning pages or inodes.
 		 */
-		if (wbc.nr_to_write <= 0)
+                if (wbc.nr_to_write < write_chunk)
 			continue;
 		/*
-		 * Didn't write everything and we don't have more IO, bail
+                 * No more inodes for IO, bail
 		 */
 		if (!wbc.more_io)
 			break;
-		/*
-		 * Did we write something? Try for more
-		 */
-		if (wbc.nr_to_write < write_chunk)
-			continue;
 		/*
 		 * Nothing written. Wait for some inode to
 		 * become available for writeback. Otherwise
@@ -757,7 +751,6 @@ static long wb_writeback(struct bdi_writeback *wb,
 		spin_lock(&inode_wb_list_lock);
 		if (!list_empty(&wb->b_more_io))  {
 			inode = wb_inode(wb->b_more_io.prev);
-			trace_wbc_writeback_wait(&wbc, wb->bdi);
 			spin_lock(&inode->i_lock);
 			inode_wait_for_writeback(inode);
 			spin_unlock(&inode->i_lock);
@@ -865,8 +858,6 @@ long wb_do_writeback(struct bdi_writeback *wb, int force_wait)
 		if (force_wait)
 			work->sync_mode = WB_SYNC_ALL;
 
-		trace_writeback_exec(bdi, work);
-
 		wrote += wb_writeback(wb, work);
 
 		/*
@@ -908,8 +899,6 @@ int bdi_writeback_thread(void *data)
 	 */
 	set_user_nice(current, 0);
 
-	trace_writeback_thread_start(bdi);
-
 	while (!kthread_should_stop()) {
 		/*
 		 * Remove own delayed wake-up timer, since we are already awake
@@ -918,8 +907,6 @@ int bdi_writeback_thread(void *data)
 		del_timer(&wb->wakeup_timer);
 
 		pages_written = wb_do_writeback(wb, 0);
-
-		trace_writeback_pages_written(pages_written);
 
 		if (pages_written)
 			wb->last_active = jiffies;
@@ -948,7 +935,6 @@ int bdi_writeback_thread(void *data)
 	if (!list_empty(&bdi->work_list))
 		wb_do_writeback(wb, 1);
 
-	trace_writeback_thread_stop(bdi);
 	return 0;
 }
 
