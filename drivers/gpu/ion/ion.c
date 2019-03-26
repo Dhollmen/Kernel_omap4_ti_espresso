@@ -37,6 +37,7 @@
 #include <linux/idr.h>
 
 #include "ion_priv.h"
+#include "../pvr/ion.h"
 
 /**
  * struct ion_device - the metadata of the ion device node
