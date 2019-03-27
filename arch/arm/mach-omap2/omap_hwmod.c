@@ -179,7 +179,7 @@ static struct omap_hwmod *mpu_oh;
 static int _update_sysc_cache(struct omap_hwmod *oh)
 {
 	if (!oh->class->sysc) {
-		WARN(1, "omap_hwmod: %s: cannot read OCP_SYSCONFIG: not defined on hwmod's class\n", oh->name);
+		pr_warning("omap_hwmod: %s: cannot read OCP_SYSCONFIG: not defined on hwmod's class\n", oh->name);
 		return -EINVAL;
 	}
 
@@ -203,7 +203,7 @@ static int _update_sysc_cache(struct omap_hwmod *oh)
 static void _write_sysconfig_raw(u32 v, struct omap_hwmod *oh)
 {
 	if (!oh->class->sysc) {
-		WARN(1, "omap_hwmod: %s: cannot write OCP_SYSCONFIG: not defined on hwmod's class\n", oh->name);
+		pr_warning("omap_hwmod: %s: cannot write OCP_SYSCONFIG: not defined on hwmod's class\n", oh->name);
 		return;
 	}
 
@@ -248,7 +248,7 @@ static int _set_master_standbymode(struct omap_hwmod *oh, u8 standbymode,
 		return -EINVAL;
 
 	if (!oh->class->sysc->sysc_fields) {
-		WARN(1, "omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
+		pr_warning("omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
 		return -EINVAL;
 	}
 
@@ -281,7 +281,7 @@ static int _set_slave_idlemode(struct omap_hwmod *oh, u8 idlemode, u32 *v)
 		return -EINVAL;
 
 	if (!oh->class->sysc->sysc_fields) {
-		WARN(1, "omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
+		pr_warning("omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
 		return -EINVAL;
 	}
 
@@ -315,7 +315,7 @@ static int _set_clockactivity(struct omap_hwmod *oh, u8 clockact, u32 *v)
 		return -EINVAL;
 
 	if (!oh->class->sysc->sysc_fields) {
-		WARN(1, "omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
+		pr_warning("omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
 		return -EINVAL;
 	}
 
@@ -345,7 +345,7 @@ static int _set_softreset(struct omap_hwmod *oh, u32 *v)
 		return -EINVAL;
 
 	if (!oh->class->sysc->sysc_fields) {
-		WARN(1, "omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
+		pr_warning("omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
 		return -EINVAL;
 	}
 
@@ -380,7 +380,7 @@ static int _set_module_autoidle(struct omap_hwmod *oh, u8 autoidle,
 		return -EINVAL;
 
 	if (!oh->class->sysc->sysc_fields) {
-		WARN(1, "omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
+		pr_warning("omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
 		return -EINVAL;
 	}
 
@@ -411,7 +411,7 @@ static int _enable_wakeup(struct omap_hwmod *oh, u32 *v)
 		return -EINVAL;
 
 	if (!oh->class->sysc->sysc_fields) {
-		WARN(1, "omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
+		pr_warning("omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
 		return -EINVAL;
 	}
 
@@ -450,7 +450,7 @@ static int _disable_wakeup(struct omap_hwmod *oh, u32 *v)
 		return -EINVAL;
 
 	if (!oh->class->sysc->sysc_fields) {
-		WARN(1, "omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
+		pr_warning("omap_hwmod: %s: offset struct for sysconfig not provided in class\n", oh->name);
 		return -EINVAL;
 	}
 
@@ -1270,7 +1270,7 @@ static int _enable(struct omap_hwmod *oh)
 	if (oh->_state != _HWMOD_STATE_INITIALIZED &&
 	    oh->_state != _HWMOD_STATE_IDLE &&
 	    oh->_state != _HWMOD_STATE_DISABLED) {
-		WARN(1, "omap_hwmod: %s: enabled state can only be entered "
+		pr_warning("omap_hwmod: %s: enabled state can only be entered "
 		     "from initialized, idle, or disabled state\n", oh->name);
 		return -EINVAL;
 	}
@@ -1333,7 +1333,7 @@ static int _enable(struct omap_hwmod *oh)
 static int _idle(struct omap_hwmod *oh)
 {
 	if (oh->_state != _HWMOD_STATE_ENABLED) {
-		WARN(1, "omap_hwmod: %s: idle state can only be entered from "
+		pr_warning("omap_hwmod: %s: idle state can only be entered from "
 		     "enabled state\n", oh->name);
 		return -EINVAL;
 	}
@@ -1409,7 +1409,7 @@ static int _shutdown(struct omap_hwmod *oh)
 
 	if (oh->_state != _HWMOD_STATE_IDLE &&
 	    oh->_state != _HWMOD_STATE_ENABLED) {
-		WARN(1, "omap_hwmod: %s: disabled state can only be entered "
+		pr_warning("omap_hwmod: %s: disabled state can only be entered "
 		     "from idle, or enabled state\n", oh->name);
 		return -EINVAL;
 	}
@@ -1541,7 +1541,7 @@ static int _setup(struct omap_hwmod *oh, void *data)
 	else if (postsetup_state == _HWMOD_STATE_DISABLED)
 		_shutdown(oh);
 	else if (postsetup_state != _HWMOD_STATE_ENABLED)
-		WARN(1, "hwmod: %s: unknown postsetup state %d! defaulting to enabled\n",
+		pr_warning("hwmod: %s: unknown postsetup state %d! defaulting to enabled\n",
 		     oh->name, postsetup_state);
 
 	return 0;
@@ -1755,8 +1755,7 @@ int __init omap_hwmod_register(struct omap_hwmod **ohs)
 			continue;
 
 		r = _register(ohs[i]);
-		WARN(r, "omap_hwmod: %s: _register returned %d\n", ohs[i]->name,
-		     r);
+		pr_warning("omap_hwmod: %s: _register returned %d\n", ohs[i]->name, r);
 	} while (ohs[++i]);
 
 	return 0;
@@ -1808,7 +1807,7 @@ int __init omap_hwmod_setup_one(const char *oh_name)
 
 	oh = _lookup(oh_name);
 	if (!oh) {
-		WARN(1, "omap_hwmod: %s: hwmod not yet registered\n", oh_name);
+		pr_warning("omap_hwmod: %s: hwmod not yet registered\n", oh_name);
 		return -EINVAL;
 	}
 
@@ -1817,13 +1816,13 @@ int __init omap_hwmod_setup_one(const char *oh_name)
 
 	r = _populate_mpu_rt_base(oh, NULL);
 	if (IS_ERR_VALUE(r)) {
-		WARN(1, "omap_hwmod: %s: couldn't set mpu_rt_base\n", oh_name);
+		pr_warning("omap_hwmod: %s: couldn't set mpu_rt_base\n", oh_name);
 		return -EINVAL;
 	}
 
 	r = _init_clocks(oh, NULL);
 	if (IS_ERR_VALUE(r)) {
-		WARN(1, "omap_hwmod: %s: couldn't init clocks\n", oh_name);
+		pr_warning("omap_hwmod: %s: couldn't init clocks\n", oh_name);
 		return -EINVAL;
 	}
 
@@ -1852,8 +1851,7 @@ static int __init omap_hwmod_setup_all(void)
 	r = omap_hwmod_for_each(_populate_mpu_rt_base, NULL);
 
 	r = omap_hwmod_for_each(_init_clocks, NULL);
-	WARN(IS_ERR_VALUE(r),
-	     "omap_hwmod: %s: _init_clocks failed\n", __func__);
+	pr_warning("omap_hwmod: %s: _init_clocks failed\n", __func__);
 
 	omap_hwmod_for_each(_setup, NULL);
 
@@ -2004,7 +2002,7 @@ void omap_hwmod_ocp_barrier(struct omap_hwmod *oh)
 	BUG_ON(!oh);
 
 	if (!oh->class->sysc || !oh->class->sysc->sysc_flags) {
-		WARN(1, "omap_device: %s: OCP barrier impossible due to "
+		pr_warning("omap_device: %s: OCP barrier impossible due to "
 		      "device configuration\n", oh->name);
 		return;
 	}
@@ -2540,18 +2538,18 @@ struct device *omap_hwmod_name_get_dev(const char *oh_name)
 	struct omap_hwmod *oh;
 
 	if (!oh_name) {
-		WARN(1, "%s: no hwmod name!\n", __func__);
+		pr_warning("%s: no hwmod name!\n", __func__);
 		return ERR_PTR(-EINVAL);
 	}
 
 	oh = _lookup(oh_name);
 	if (IS_ERR_OR_NULL(oh)) {
-		WARN(1, "%s: no hwmod for %s\n", __func__,
+		pr_warning("%s: no hwmod for %s\n", __func__,
 			oh_name);
 		return ERR_PTR(oh ? PTR_ERR(oh) : -ENODEV);
 	}
 	if (IS_ERR_OR_NULL(oh->od)) {
-		WARN(1, "%s: no omap_device for %s\n", __func__,
+		pr_warning("%s: no omap_device for %s\n", __func__,
 			oh_name);
 		return ERR_PTR(oh ? PTR_ERR(oh) : -ENODEV);
 	}
