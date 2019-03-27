@@ -364,10 +364,10 @@ int gpio_event_input_func(struct gpio_event_input_devs *input_devs,
 		spin_lock_irqsave(&ds->irq_lock, irqflags);
 		ds->use_irq = ret == 0;
 
-		pr_info("GPIO Input Driver: Start gpio inputs for %s%s in %s "
-			"mode\n", input_devs->dev[0]->name,
-			(input_devs->count > 1) ? "..." : "",
-			ret == 0 ? "interrupt" : "polling");
+		//pr_info("GPIO Input Driver: Start gpio inputs for %s%s in %s "
+		//	"mode\n", input_devs->dev[0]->name,
+		//	(input_devs->count > 1) ? "..." : "",
+		//	ret == 0 ? "interrupt" : "polling");
 
 		hrtimer_init(&ds->timer, CLOCK_MONOTONIC, HRTIMER_MODE_REL);
 		ds->timer.function = gpio_event_input_timer_func;
