@@ -435,7 +435,7 @@ int omap4_espresso_get_adc(enum espresso_adc_ch ch)
 		for (i = 0; i < 5; i++) {
 			usleep_range(5000, 5500);
 			adc_tmp = stmpe811_adc_get_value(stmpe811_ch);
-			pr_info("adc_check_1 adc=%d\n", adc_tmp);
+			// pr_info("adc_check_1 adc=%d\n", adc_tmp);
 			adc_sum += adc_tmp;
 			if (adc_max < adc_tmp)
 				adc_max = adc_tmp;
