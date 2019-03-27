@@ -1702,11 +1702,11 @@ static int __init omap4_pm_init(void)
 		unsigned int rate;
 
 		if (!oh || !oh->od || !oh->main_clk) {
-			pr_warn("%s: no hwmod or odev or clk for %s, [%d] "
-				"oh=%p od=%p clk=%p cannot add OPPs.\n",
-				__func__, init_devices[i], i, oh,
-				(oh) ? oh->od : NULL,
-				(oh) ? oh->main_clk :  NULL);
+			//pr_warn("%s: no hwmod or odev or clk for %s, [%d] "
+			//	"oh=%p od=%p clk=%p cannot add OPPs.\n",
+			//	__func__, init_devices[i], i, oh,
+			//	(oh) ? oh->od : NULL,
+			//	(oh) ? oh->main_clk :  NULL);
 			continue;
 		}
 
