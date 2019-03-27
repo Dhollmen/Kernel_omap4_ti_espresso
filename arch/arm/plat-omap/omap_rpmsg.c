@@ -208,7 +208,7 @@ static int omap_rpmsg_mbox_callback(struct notifier_block *this,
 		rproc_error_notify(rpdev->rproc);
 		break;
 	case RP_MBOX_ECHO_REPLY:
-		pr_info("received echo reply from %s !\n", rpdev->rproc_name);
+		//pr_info("received echo reply from %s !\n", rpdev->rproc_name);
 		break;
 #ifndef CONFIG_MACH_TUNA
 	case RP_MSG_BOOTINIT_DONE:
@@ -322,7 +322,7 @@ static int rpmsg_rproc_resume(struct omap_rpmsg_vproc *rpdev)
 
 static int rpmsg_rproc_secure(struct omap_rpmsg_vproc *rpdev, bool s)
 {
-	pr_err("%s: %s secure mode\n", rpdev->rproc_name, s ? "enter" : "exit");
+	//pr_err("%s: %s secure mode\n", rpdev->rproc_name, s ? "enter" : "exit");
 	if (rpdev->slave_reset)
 		return NOTIFY_DONE;
 	rpmsg_reset_devices(rpdev);
