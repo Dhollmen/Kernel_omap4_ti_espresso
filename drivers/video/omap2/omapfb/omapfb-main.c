@@ -2547,8 +2547,8 @@ static int omapfb_probe(struct platform_device *pdev)
 		struct omap_overlay_manager *mgr;
 		mgr = fbdev->managers[i];
 		r = mgr->apply(mgr);
-		if (r)
-			dev_warn(fbdev->dev, "failed to apply dispc config\n");
+		//if (r)
+		//	dev_warn(fbdev->dev, "failed to apply dispc config\n");
 	}
 
 	DBG("mgr->apply'ed\n");

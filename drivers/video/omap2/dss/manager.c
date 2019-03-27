@@ -94,7 +94,7 @@ static ssize_t manager_display_store(struct omap_overlay_manager *mgr,
 
 		r = mgr->apply(mgr);
 		if (r) {
-			DSSERR("failed to apply dispc config\n");
+			//DSSERR("failed to apply dispc config\n");
 			goto put_device;
 		}
 	}
