@@ -44,13 +44,6 @@ u16 cpu_mask;
 
 /* Private functions */
 
-static void _omap4_module_wait_ready(struct clk *clk)
-{
-	if (omap4_cm_wait_module_ready(clk->enable_reg) < 0)
-		pr_err("%s: Timeout waiting for module enable (%s: clkctrl = 0x%x)\n",
-		       __func__, clk->name, __raw_readl(clk->enable_reg));
-}
-
 /**
  * _omap2_module_wait_ready - wait for an OMAP module to leave IDLE
  * @clk: struct clk * belonging to the module
@@ -199,9 +192,7 @@ int omap2_dflt_clk_enable(struct clk *clk)
 	v = __raw_readl(clk->enable_reg); /* OCP barrier */
 
 	if (clk->ops->find_idlest) {
-		if (cpu_is_omap44xx())
-			_omap4_module_wait_ready(clk);
-		else
+		if (! cpu_is_omap44xx())
 			_omap2_module_wait_ready(clk);
 	}
 
