@@ -192,7 +192,7 @@ static int accel_open_calibration(void)
 		S_IRUGO | S_IWUSR | S_IWGRP);
 
 	if (IS_ERR(cal_filp)) {
-		pr_err("%s: Can't open calibration file\n", __func__);
+		//pr_err("%s: Can't open calibration file\n", __func__);
 		set_fs(old_fs);
 		err = PTR_ERR(cal_filp);
 		return err;
@@ -205,8 +205,8 @@ static int accel_open_calibration(void)
 		err = -EIO;
 	}
 
-	pr_info("%s: (%d,%d,%d)\n", __func__,
-		data->cal_data.v[0], data->cal_data.v[1], data->cal_data.v[2]);
+	//pr_info("%s: (%d,%d,%d)\n", __func__,
+	//	data->cal_data.v[0], data->cal_data.v[1], data->cal_data.v[2]);
 	filp_close(cal_filp, current->files);
 	set_fs(old_fs);
 
@@ -259,9 +259,9 @@ static int accel_do_calibrate(int enable)
 		data->cal_data.v[2] = 0;
 	}
 
-	pr_info("%s: cal data (%d,%d,%d)\n", __func__,
-			data->cal_data.v[0], data->cal_data.v[1],
-				data->cal_data.v[2]);
+	//pr_info("%s: cal data (%d,%d,%d)\n", __func__,
+	//		data->cal_data.v[0], data->cal_data.v[1],
+	//			data->cal_data.v[2]);
 
 	old_fs = get_fs();
 	set_fs(KERNEL_DS);
@@ -272,7 +272,7 @@ static int accel_do_calibrate(int enable)
 			S_IRUGO | S_IWUSR | S_IWGRP);
 
 	if (IS_ERR(cal_filp)) {
-		pr_err("%s: Can't open calibration file\n", __func__);
+		//pr_err("%s: Can't open calibration file\n", __func__);
 		set_fs(old_fs);
 		err = PTR_ERR(cal_filp);
 		return err;
@@ -281,7 +281,7 @@ static int accel_do_calibrate(int enable)
 	err = cal_filp->f_op->write(cal_filp,
 		(char *)&data->cal_data, 3 * sizeof(s16), &cal_filp->f_pos);
 	if (err != 3 * sizeof(s16)) {
-		pr_err("%s: Can't write the cal data to file\n", __func__);
+		//pr_err("%s: Can't write the cal data to file\n", __func__);
 		err = -EIO;
 	}
 
@@ -438,12 +438,12 @@ static int yas_acc_core_driver_init(struct yas_acc_private_data *data)
 	}
 	if (data->acc_pdata) {
 		if (data->acc_pdata->orientation) {
-			pr_info("%s: set from board file.\n", __func__);
+			//pr_info("%s: set from board file.\n", __func__);
 			err = driver->set_position(
 				data->acc_pdata->orientation
 				- YAS532_POSITION_OFFSET);
 		} else {
-			pr_info("%s: set from defconfig.\n", __func__);
+			//pr_info("%s: set from defconfig.\n", __func__);
 			err = driver->set_position(
 				CONFIG_INPUT_YAS_ACCELEROMETER_POSITION);
 		}
@@ -455,8 +455,8 @@ static int yas_acc_core_driver_init(struct yas_acc_private_data *data)
 		kfree(driver);
 		return err;
 	}
-	pr_info("%s: accelerometer position is %d\n", __func__,
-				driver->get_position());
+	//pr_info("%s: accelerometer position is %d\n", __func__,
+	//			driver->get_position());
 	return 0;
 }
 
@@ -1005,8 +1005,8 @@ static ssize_t acc_data_read(struct device *dev,
 	x = (accel.xyz.v[0] - data->cal_data.v[0]) * 4;
 	y = (accel.xyz.v[1] - data->cal_data.v[1]) * 4;
 	z = (accel.xyz.v[2] - data->cal_data.v[2]) * 4;
-	pr_info("acc_data_read x: %d y: %d z: %d\n",
-		x, y, z);
+	//pr_info("acc_data_read x: %d y: %d z: %d\n",
+	//	x, y, z);
 
 	return sprintf(buf, "%d, %d, %d\n", x, y, z);
 }
@@ -1028,7 +1028,7 @@ static ssize_t accel_calibration_show(struct device *dev,
 	x = data->cal_data.v[0];
 	y = data->cal_data.v[1];
 	z = data->cal_data.v[2];
-	pr_info(" accel_calibration_show %d %d %d\n", x, y, z);
+	//pr_info(" accel_calibration_show %d %d %d\n", x, y, z);
 
 	if (!x && !y && !z)
 		err = -1;
@@ -1063,7 +1063,7 @@ static ssize_t accel_calibration_store(struct device *dev,
 	y = data->cal_data.v[1];
 	z = data->cal_data.v[2];
 
-	pr_info("accel_calibration_store %d %d %d\n", x, y, z);
+	//pr_info("accel_calibration_store %d %d %d\n", x, y, z);
 	if (err > 0)
 		err = 0;
 	count = sprintf(tmp, "%d\n", err);
