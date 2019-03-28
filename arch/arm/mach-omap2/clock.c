@@ -44,6 +44,14 @@ u16 cpu_mask;
 
 /* Private functions */
 
+static void _omap4_module_wait_ready(struct clk *clk)
+{
+	if (omap4_cm_wait_module_ready(clk->enable_reg) < 0) {
+		//pr_err("%s: Timeout waiting for module enable (%s: clkctrl = 0x%x)\n",
+		//       __func__, clk->name, __raw_readl(clk->enable_reg));
+    }
+}
+
 /**
  * _omap2_module_wait_ready - wait for an OMAP module to leave IDLE
  * @clk: struct clk * belonging to the module
@@ -192,7 +200,9 @@ int omap2_dflt_clk_enable(struct clk *clk)
 	v = __raw_readl(clk->enable_reg); /* OCP barrier */
 
 	if (clk->ops->find_idlest) {
-		if (! cpu_is_omap44xx())
+		if (cpu_is_omap44xx())
+			_omap4_module_wait_ready(clk);
+		else
 			_omap2_module_wait_ready(clk);
 	}
 
@@ -208,8 +218,8 @@ void omap2_dflt_clk_disable(struct clk *clk)
 		 * 'Independent' here refers to a clock which is not
 		 * controlled by its parent.
 		 */
-		printk(KERN_ERR "clock: clk_disable called on independent "
-		       "clock %s which has no enable_reg\n", clk->name);
+		//printk(KERN_ERR "clock: clk_disable called on independent "
+		//       "clock %s which has no enable_reg\n", clk->name);
 		return;
 	}
 
@@ -258,8 +268,8 @@ const struct clkops clkops_omap2_dflt = {
 void omap2_clk_disable(struct clk *clk)
 {
 	if (clk->usecount == 0) {
-		WARN(1, "clock: %s: omap2_clk_disable() called, but usecount "
-		     "already 0?", clk->name);
+		//WARN(1, "clock: %s: omap2_clk_disable() called, but usecount "
+		//     "already 0?", clk->name);
 		return;
 	}
 
@@ -311,8 +321,8 @@ int omap2_clk_enable(struct clk *clk)
 	if (clk->parent) {
 		ret = omap2_clk_enable(clk->parent);
 		if (ret) {
-			WARN(1, "clock: %s: could not enable parent %s: %d\n",
-			     clk->name, clk->parent->name, ret);
+			//WARN(1, "clock: %s: could not enable parent %s: %d\n",
+			//     clk->name, clk->parent->name, ret);
 			goto oce_err1;
 		}
 	}
@@ -320,8 +330,8 @@ int omap2_clk_enable(struct clk *clk)
 	if (clk->clkdm) {
 		ret = clkdm_clk_enable(clk->clkdm, clk);
 		if (ret) {
-			WARN(1, "clock: %s: could not enable clockdomain %s: "
-			     "%d\n", clk->name, clk->clkdm->name, ret);
+			//WARN(1, "clock: %s: could not enable clockdomain %s: "
+			//     "%d\n", clk->name, clk->clkdm->name, ret);
 			goto oce_err2;
 		}
 	}
@@ -330,8 +340,8 @@ int omap2_clk_enable(struct clk *clk)
 		trace_clock_enable(clk->name, 1, smp_processor_id());
 		ret = clk->ops->enable(clk);
 		if (ret) {
-			WARN(1, "clock: %s: could not enable: %d\n",
-			     clk->name, ret);
+			//WARN(1, "clock: %s: could not enable: %d\n",
+			//     clk->name, ret);
 			goto oce_err3;
 		}
 	}
@@ -487,8 +497,8 @@ int __init omap2_clk_switch_mpurate_at_boot(const char *mpurate_ck_name)
 
 	r = clk_set_rate(mpurate_ck, mpurate);
 	if (IS_ERR_VALUE(r)) {
-		WARN(1, "clock: %s: unable to set MPU rate to %d: %d\n",
-		     mpurate_ck->name, mpurate, r);
+		//WARN(1, "clock: %s: unable to set MPU rate to %d: %d\n",
+		//     mpurate_ck->name, mpurate, r);
 		return -EINVAL;
 	}
 
