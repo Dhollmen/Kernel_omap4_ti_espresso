@@ -309,7 +309,7 @@ checks:
 		scan_base = offset = si->lowest_bit;
 
 	/* reuse swap entry of cache-only swap if not busy. */
-	if (vm_swap_full(si) && si->swap_map[offset] == SWAP_HAS_CACHE) {
+	if (si->swap_map[offset] == SWAP_HAS_CACHE) {
 		int swap_was_freed;
 		spin_unlock(&swap_lock);
 		swap_was_freed = __try_to_reclaim_swap(si, offset);
@@ -398,8 +398,7 @@ scan:
 			spin_lock(&swap_lock);
 			goto checks;
 		}
-		if (vm_swap_full(si) &&
-			si->swap_map[offset] == SWAP_HAS_CACHE) {
+		if (si->swap_map[offset] == SWAP_HAS_CACHE) {
 			spin_lock(&swap_lock);
 			goto checks;
 		}
@@ -414,8 +413,7 @@ scan:
 			spin_lock(&swap_lock);
 			goto checks;
 		}
-		if (vm_swap_full(si) &&
-			si->swap_map[offset] == SWAP_HAS_CACHE) {
+		if (si->swap_map[offset] == SWAP_HAS_CACHE) {
 			spin_lock(&swap_lock);
 			goto checks;
 		}
@@ -729,9 +727,7 @@ int free_swap_and_cache(swp_entry_t entry)
 		 * Not mapped elsewhere, or swap space full? Free it!
 		 * Also recheck PageSwapCache now page is locked (above).
 		 */
-		if (PageSwapCache(page) && !PageWriteback(page) &&
-				(!page_mapped(page) ||
-				vm_swap_full(page_swap_info(page)))) {
+        if (PageSwapCache(page) && !PageWriteback(page)) {
 			delete_from_swap_cache(page);
 			SetPageDirty(page);
 		}
