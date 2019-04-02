@@ -202,6 +202,9 @@ struct swap_list_t {
 	int next;	/* swapfile to be used next */
 };
 
+/* Swap 50% full?  */
+#define vm_swap_full() (nr_swap_pages*2 < total_swap_pages)
+
 /* linux/mm/page_alloc.c */
 extern unsigned long totalram_pages;
 extern unsigned long totalreserve_pages;
@@ -319,20 +322,6 @@ extern struct page *swapin_readahead(swp_entry_t, gfp_t,
 extern long nr_swap_pages;
 extern long total_swap_pages;
 extern bool is_swap_fast(swp_entry_t entry);
-
-/* Swap 50% full? */
-static inline bool vm_swap_full(struct swap_info_struct *si)
-{
-	/*
-	 * If the swap device is fast, return true
-	 * not to delay swap free.
-	 */
-	if (si->flags & SWP_FAST)
-		return true;
-
-	return nr_swap_pages*2 < total_swap_pages;
-}
-
 extern void si_swapinfo(struct sysinfo *);
 extern swp_entry_t get_swap_page(void);
 extern swp_entry_t get_swap_page_of_type(int);
@@ -361,7 +350,7 @@ extern void disable_swap_token(struct mem_cgroup *memcg);
 
 static inline int has_swap_token(struct mm_struct *mm)
 {
-	return (mm == swap_token_mm);
+	return (mm == swap_token_mm && vm_swap_full());
 }
 
 static inline void put_swap_token(struct mm_struct *mm)
@@ -392,8 +381,7 @@ static inline void mem_cgroup_uncharge_swap(swp_entry_t ent)
 
 #define nr_swap_pages				0L
 #define total_swap_pages			0L
-#define total_swapcache_pages			0UL
-#define vm_swap_full(si)			0
+#define total_swapcache_pages		0UL
 
 #define si_swapinfo(val) \
 	do { (val)->freeswap = (val)->totalswap = 0; } while (0)
