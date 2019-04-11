@@ -567,6 +567,12 @@ config OMAP4430_GPU_HAS_GPU_512MHZ
 	help
 	  Enables the 512 MHz GPU frequency for OMAP4430 devices.
 
+config OMAP4430_IS_P31XX
+	bool "Enables P31Xx voltage"
+	depends on OMAP4430_CPU_HAS_MPU_1_2GHZ
+	help
+	  Uses the voltage needed by Samsung Galaxy Tab2 7 inches models
+	  
 config OMAP4460_GPU_OVERCLOCK
 	bool "Up to 512 MHz frequency for OMAP4460 GPU"
 	depends on ARCH_OMAP4
