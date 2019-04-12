@@ -108,11 +108,11 @@ struct omap4_ldo_abb_trim_data {
 #define OMAP4430_VDD_MPU_OPPNITROSB_UV    1225000      /* 1216 MHz */
 #else
 /* P31XX model */
-#define OMAP4430_VDD_MPU_OPP50_UV         1025000      /*  300 MHz */
-#define OMAP4430_VDD_MPU_OPP100_UV        1200000      /*  600 MHz */
-#define OMAP4430_VDD_MPU_OPPTURBO_UV      1325000      /*  800 MHz */
-#define OMAP4430_VDD_MPU_OPPNITRO_UV      1388000      /* 1008 MHz */
-#define OMAP4430_VDD_MPU_OPPNITROSB_UV    1398000      /* 1216 MHz */
+#define OMAP4430_VDD_MPU_OPP50_UV          775000      /*  300 MHz */
+#define OMAP4430_VDD_MPU_OPP100_UV         925000      /*  600 MHz */
+#define OMAP4430_VDD_MPU_OPPTURBO_UV      1050000      /*  800 MHz */
+#define OMAP4430_VDD_MPU_OPPNITRO_UV      1150000      /* 1008 MHz */
+#define OMAP4430_VDD_MPU_OPPNITROSB_UV    1275000      /* 1216 MHz */
 #endif
 #else
 /* CPU_HAS_MPU_1_4GHZ */
@@ -126,12 +126,12 @@ struct omap4_ldo_abb_trim_data {
 #define OMAP4430_VDD_MPU_OPPSUPERSB_UV    1398000      /* 1472 MHz */
 #else
 /* P31XX model */
-#define OMAP4430_VDD_MPU_OPP50_UV         1025000      /*  300 MHz */
-#define OMAP4430_VDD_MPU_OPP100_UV        1200000      /*  600 MHz */
-#define OMAP4430_VDD_MPU_OPPTURBO_UV      1345000      /*  912 MHz */
-#define OMAP4430_VDD_MPU_OPPNITRO_UV      1398000      /* 1216 MHz */
-#define OMAP4430_VDD_MPU_OPPNITROSB_UV    1450000      /* 1360 MHz */
-#define OMAP4430_VDD_MPU_OPPSUPERSB_UV    1495000      /* 1472 MHz */
+#define OMAP4430_VDD_MPU_OPP50_UV          775000      /*  300 MHz */
+#define OMAP4430_VDD_MPU_OPP100_UV         925000      /*  600 MHz */
+#define OMAP4430_VDD_MPU_OPPTURBO_UV      1100000      /*  912 MHz */
+#define OMAP4430_VDD_MPU_OPPNITRO_UV      1275000      /* 1216 MHz */
+#define OMAP4430_VDD_MPU_OPPNITROSB_UV    1325000      /* 1360 MHz */
+#define OMAP4430_VDD_MPU_OPPSUPERSB_UV    1450000      /* 1472 MHz */
 #endif
 #endif
 #endif
